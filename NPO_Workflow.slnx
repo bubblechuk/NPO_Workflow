@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="NPO_Workflow.DAL/NPO_Workflow.DAL.csproj" />
+  <Project Path="NPO_Workflow/NPO_Workflow.csproj" />
+</Solution>
