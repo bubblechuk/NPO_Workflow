@@ -1,0 +1,180 @@
+﻿@using NPO_Workflow.DAL
+@model IEnumerable<NPO_Workflow.ViewModels.Operations.OperationViewModel>
+
+<div class="text-center mt-5">
+    
+</div>
+<div class="d-flex justify-content-between align-items-center mt-3 mb-3">
+    <form method="get" action="@Url.Action("Index" ,"Operations")">
+    <div class="input-group" style="max-width: 200px;">
+        <input type="text" class="form-control" placeholder="Поиск..." name="search" value="@Context.Request.Query["search"]">
+        <button class="btn btn-outline-primary" type="submit">
+            <i class="bi-search"></i>
+        </button>
+    </div>
+    </form>
+    <h1 class="display-6">Операции</h1>
+    <div class="d-flex gap-2">
+        <button type="button" class="btn btn-primary" id="createOperationButton"><i class="bi-database-add"></i> Добавить операцию</button>
+    </div>
+</div>
+<table class="table table-striped text-center">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Наименование</th>
+            <th scope="col">№ Инструкции по ТБ</th>
+            <th scope="col">Т п.з.</th>
+            <th scope="col">Вид оплаты</th>
+            <th scope="col">Участок</th>
+            <th scope="col">На операцию (ч)</th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody class="tbody-operations">
+        @foreach (var op in Model)
+        {
+            <tr class="align-middle">
+                <td>@op.Id</td>
+                <td>@op.Name</td>
+                <td>@op.Instruction</td>
+                <td>@op.Tpz</td>
+                <td>@op.PaymentType</td>
+                <td>@op.Section</td>
+                <td>@op.HourLength</td>
+                <td style="width: 1%; white-space: nowrap;">
+                    <button type="button" class="btn btn-secondary btn-sm edit-operation-button" title="Редактировать" data-id="@op.Id">
+                        <i class="bi-pencil"></i>
+                    </button>
+                </td>
+                <td style="width: 1%; white-space: nowrap;">
+                    <button type="button" class="btn btn-danger btn-sm delete-operation-button" title="Удалить" data-id="@op.Id">
+                        <i class="bi-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        }
+        @if (Model.Count() < 10)
+        {
+            for (int i = 0; i < 10 - Model.Count(); i++)
+            {
+                <tr class="align-middle" style="height: 48px;">
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                </tr>
+            }
+        }
+        </tbody>
+</table>
+
+@if (ViewBag.TotalPages > 1)
+    {
+    <div class="d-flex justify-content-center">
+     <ul class="pagination">
+    <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                <a class="page-link" href="@Url.Action("Index", new { search = ViewBag.SearchQuery, page = ViewBag.CurrentPage - 1 })">Пред.</a>
+        </li>
+    @for (int p = 1; p < ViewBag.TotalPages; p++)
+            {
+                <li class="page-item @(p == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("Index", new { search = ViewBag.SearchQuery, page = p })">@p</a>
+                </li>
+            }
+            <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                <a class="page-link" href="@Url.Action("Index", new { search = ViewBag.SearchQuery, page = ViewBag.CurrentPage + 1 })">След.</a>
+        </li>
+    </ul>
+    </div>
+    }
+
+<div class="modal fade" id="createModal">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content shadow-lg">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalTitle">Новая производственная операция</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4" id="modalBodyContainer"></div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        $(document).ready(() => {
+            $('#createOperationButton').click(function () {
+                var url = '@Url.Action("Create", "Operations")'
+                $('#modalTitle').text("Новая производственная операция");
+                $('#modalBodyContainer').load(url, function () {
+                    $('#createModal').modal('show')
+                })
+            })
+
+            $('.tbody-operations').on('click', '.delete-operation-button', function () {
+                var operationId = $(this).data('id')
+                var $row = $(this).closest('tr')
+                if (confirm(`Вы уверены что хотите удалить операцию с ID: ${operationId}?`)) {
+                    $.ajax({
+                        url: '@Url.Action("Delete", "Operations")',
+                        type: 'POST',
+                        data: { id: operationId },
+                        success: function (result) {
+                            $row.fadeOut(400, function () {
+                                $(this).remove();
+                                window.location.reload();
+                            })
+                        },
+                        error: function (xhr, status, error) {
+                            alert('Ошибка удаления операции: ' + error)
+                        }
+                    })
+                }
+            })
+
+            $('.tbody-operations').on('click', '.edit-operation-button', function () {
+                var operationId = $(this).data('id')
+                var url = '@Url.Action("Modify", "Operations")' + '/' + operationId;
+                $('#modalTitle').text("Редактирование производственной операции");
+                $('#modalBodyContainer').load(url, function () {
+                    $('#createModal').modal('show')
+                })
+            })
+
+                    $('#createModal').on('submit', 'form', function (e) {
+            e.preventDefault();
+
+            var $form = $(this);
+            var url = $form.attr('action');
+            var formData = $form.serialize();
+
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: formData,
+                success: function (response, status, xhr) {
+                    if (response && response.indexOf('<form') !== -1) {
+                        $('#modalBodyContainer').html(response);
+                        var $newForm = $('#modalBodyContainer').find('form');
+                        if (typeof $.validator !== 'undefined' && $.validator.unobtrusive) {
+                            $.validator.unobtrusive.parse($newForm);
+                        }
+                    } else {
+                        $('#createModal').modal('hide');
+                        window.location.reload();
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert("Ошибка при отправке данных: " + error);
+                }
+            });
+        });
+        })
+    </script>
+}
