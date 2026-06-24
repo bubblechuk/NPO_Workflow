@@ -2,9 +2,9 @@
 
 <form asp-action="Create" asp-controller="Operations" method="post">
     @Html.AntiForgeryToken()
-
+    <p class="text-muted small"><span class="text-danger">*</span> — обязательные для заполнения поля</p>
     <div class="form-group mb-2">
-        <label asp-for="Name" class="form-label">Название</label>
+        <label asp-for="Name" class="form-label">Название <span class="text-danger">*</span></label>
         <input asp-for="Name" class="form-control" />
         <span asp-validation-for="Name" class="text-danger"></span>
     </div>
@@ -12,33 +12,37 @@
     <div class="form-group mb-3">
         <label asp-for="Instruction" class="form-label">Инструкция</label>
         <input asp-for="Instruction" class="form-control" />
-        <span asp-validation-for="Instruction" class="text-danger"></span>
     </div>
 
-    <hr /> <div class="row">
-    <div class="form-group col-md-6 mb-2">
-        <label asp-for="Tpz" class="form-label">Тпз</label>
-        <input asp-for="Tpz" class="form-control" type="number" step="0.01" />
-    </div>
-    <div class="form-group col-md-6 mb-2">
-        <label asp-for="HourLength" class="form-label">Длительность (ч)</label>
-        <input asp-for="HourLength" class="form-control" type="number" step="1" />
-    </div>
-</div>
+    <hr />
 
-<div class="row">
-    <div class="form-group col-md-6 mb-3">
-        <label asp-for="PaymentType" class="form-label">Тип оплаты</label>
-        <input asp-for="PaymentType" class="form-control" />
+    <div class="row">
+        <div class="form-group col-md-6 mb-2">
+            <label asp-for="Tpz" class="form-label">Тпз <span class="text-danger">*</span></label>
+            <input asp-for="Tpz" class="form-control" type="number" step="0.01" />
+            <span asp-validation-for="Tpz" class="text-danger"></span>
+        </div>
+        <div class="form-group col-md-6 mb-2">
+            <label asp-for="HourLength" class="form-label">Длительность (ч) <span class="text-danger">*</span></label>
+            <input asp-for="HourLength" class="form-control" type="number" step="1" />
+            <span asp-validation-for="HourLength" class="text-danger"></span>
+        </div>
     </div>
-    <div class="form-group col-md-6 mb-3">
-        <label asp-for="Section" class="form-label">Участок</label>
-        <input asp-for="Section" class="form-control" />
-    </div>
-</div>
 
-<div class="modal-footer px-0 pb-0 d-flex gap-2">
-    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-    <button type="submit" class="btn btn-success">Сохранить</button>
-</div>
+    <div class="row">
+        <div class="form-group col-md-6 mb-3">
+            <label asp-for="PaymentType" class="form-label">Тип оплаты</label>
+            <input asp-for="PaymentType" class="form-control" />
+        </div>
+        <div class="form-group col-md-6 mb-3">
+            <label asp-for="Section" class="form-label">Участок <span class="text-danger">*</span></label>
+            <input asp-for="Section" class="form-control" />
+            <span asp-validation-for="Section" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="modal-footer px-0 pb-0 d-flex gap-2">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+        <button type="submit" class="btn btn-success">Сохранить</button>
+    </div>
 </form>
