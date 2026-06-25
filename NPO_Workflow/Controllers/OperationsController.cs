@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using NPO_Workflow.DAL;
 using NPO_Workflow.DAL.Models;
+using NPO_Workflow.Extensions;
+using NPO_Workflow.ViewModels;
 using NPO_Workflow.ViewModels.Operations;
 
 namespace NPO_Workflow.Controllers
@@ -11,7 +14,7 @@ namespace NPO_Workflow.Controllers
     public class OperationsController : Controller
     {
         private NPOContext _context;
-        public async Task<IActionResult> Index(string search, int page = 1)
+        public async Task<IActionResult> Index(string search, int page = 1, string sortBy = "Id", bool? sortOrder = null)
         {
             int pageSize = 10;
             if (page < 1) page = 1;
@@ -28,6 +31,7 @@ namespace NPO_Workflow.Controllers
             if (totalPages < 1) totalPages = 1;
 
             var operations = await query
+                .OrderByDynamic(sortBy, sortOrder ?? false)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .Select(op => new OperationViewModel
@@ -44,6 +48,18 @@ namespace NPO_Workflow.Controllers
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = totalPages;
             ViewBag.SearchQuery = search;
+            ViewBag.SortBy = sortBy;
+            ViewBag.SortOrder = sortOrder;
+            ViewBag.Columns = new List<SortColumn>
+            {
+                new() { Key = "Id", Label = "ID" },
+                new() { Key = "Name", Label = "Наименование" },
+                new() { Key = "Instruction", Label = "№ Инструкции по ТБ" },
+                new() { Key = "Tpz", Label = "Т п.з." },
+                new() { Key = "PaymentType", Label = "Вид оплаты" },
+                new() { Key = "Section", Label = "Участок" },
+                new() { Key = "HourLength", Label = "На операцию (ч)" }
+            };
             return View(operations);
         }
         public OperationsController(NPOContext context)

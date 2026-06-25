@@ -39,3 +39,13 @@ body {
     max-height: 480px;
     overflow-y: scroll;
 }
+.nav-link {
+    border-radius: 0.25rem;
+    margin-right: 5px;
+}
+.nav-item.active .nav-link {
+    background-color: rgb(0, 0, 0, 0.15);
+}
+.nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}

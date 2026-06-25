@@ -1,5 +1,4 @@
-﻿@using NPO_Workflow.DAL
-@model IEnumerable<NPO_Workflow.ViewModels.Operations.OperationViewModel>
+﻿@model IEnumerable<NPO_Workflow.ViewModels.Operations.OperationViewModel>
 
 <div class="text-center mt-5">
     
@@ -21,13 +20,22 @@
 <table class="table table-striped text-center">
     <thead class="thead-dark">
         <tr>
-            <th scope="col">ID</th>
-            <th scope="col">Наименование</th>
-            <th scope="col">№ Инструкции по ТБ</th>
-            <th scope="col">Т п.з.</th>
-            <th scope="col">Вид оплаты</th>
-            <th scope="col">Участок</th>
-            <th scope="col">На операцию (ч)</th>
+            @foreach (var col in ViewBag.Columns)
+            {
+                bool isActive = ViewBag.SortBy == col.Key;
+                bool nextDesc = isActive && ViewBag.SortOrder == true;
+
+                <th scope="col">
+                    <a asp-action="Index"
+                       asp-route-page="1"
+                       asp-route-search="@ViewBag.SearchQuery"
+                       asp-route-sortBy="@col.Key"
+                       asp-route-sortOrder="@(nextDesc ? false : true)"
+                       class="text-decoration-none @(isActive ? "fw-bold" : "")">
+                        @col.Label @(isActive ? (ViewBag.SortOrder == false ? "▲" : "▼") : "")
+                    </a>
+                </th>
+            }
             <th></th>
             <th></th>
         </tr>
@@ -76,24 +84,28 @@
 </table>
 
 @if (ViewBag.TotalPages > 1)
-    {
+{
+    int startPage = Math.Max(1, ViewBag.CurrentPage - 1);
+    int endPage = Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 1);
     <div class="d-flex justify-content-center">
-     <ul class="pagination">
-    <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
-                <a class="page-link" href="@Url.Action("Index", new { search = ViewBag.SearchQuery, page = ViewBag.CurrentPage - 1 })">Пред.</a>
-        </li>
-    @for (int p = 1; p < ViewBag.TotalPages; p++)
+        <ul class="pagination">
+            <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                <a class="page-link" href="@Url.Action("Index", new { search = ViewBag.SearchQuery, sortBy = ViewBag.SortBy, sortOrder = ViewBag.SortOrder, page = ViewBag.CurrentPage - 1 })">Пред.</a>
+            </li>
+
+            @for (int p = startPage; p <= endPage; p++)
             {
                 <li class="page-item @(p == ViewBag.CurrentPage ? "active" : "")">
-                    <a class="page-link" href="@Url.Action("Index", new { search = ViewBag.SearchQuery, page = p })">@p</a>
+                    <a class="page-link" href="@Url.Action("Index", new { search = ViewBag.SearchQuery, sortBy = ViewBag.SortBy, sortOrder = ViewBag.SortOrder, page = p })">@p</a>
                 </li>
             }
+
             <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
-                <a class="page-link" href="@Url.Action("Index", new { search = ViewBag.SearchQuery, page = ViewBag.CurrentPage + 1 })">След.</a>
-        </li>
-    </ul>
+                <a class="page-link" href="@Url.Action("Index", new { search = ViewBag.SearchQuery, sortBy = ViewBag.SortBy, sortOrder = ViewBag.SortOrder, page = ViewBag.CurrentPage + 1 })">След.</a>
+            </li>
+        </ul>
     </div>
-    }
+}
 
 <div class="modal fade" id="createModal">
     <div class="modal-dialog modal-lg modal-dialog-centered">
