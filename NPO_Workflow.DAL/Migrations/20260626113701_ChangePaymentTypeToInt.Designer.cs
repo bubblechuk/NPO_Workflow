@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NPO_Workflow.DAL.Migrations
 {
     [DbContext(typeof(NPOContext))]
-    [Migration("20260626080204_AddDataAnnotationsAndM2M")]
-    partial class AddDataAnnotationsAndM2M
+    [Migration("20260626113701_ChangePaymentTypeToInt")]
+    partial class ChangePaymentTypeToInt
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -120,9 +120,8 @@ namespace NPO_Workflow.DAL.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("character varying(250)");
 
-                    b.Property<string>("PaymentType")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                    b.Property<int?>("PaymentType")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Section")
                         .IsRequired()
@@ -160,6 +159,9 @@ namespace NPO_Workflow.DAL.Migrations
                         .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("character varying(150)");
+
+                    b.Property<bool>("isDeleted")
+                        .HasColumnType("boolean");
 
                     b.HasKey("Id");
 

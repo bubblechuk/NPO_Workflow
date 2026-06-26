@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -6,48 +7,49 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NPO_Workflow.DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class AddDataAnnotationsAndM2M : Migration
+    public partial class ChangePaymentTypeToInt : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<string>(
-                name: "Section",
-                table: "Operations",
-                type: "character varying(100)",
-                maxLength: 100,
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "text");
+            migrationBuilder.CreateTable(
+                name: "AuditLogs",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Timestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LogLevel = table.Column<string>(type: "text", nullable: false),
+                    User = table.Column<string>(type: "text", nullable: false),
+                    Action = table.Column<string>(type: "text", nullable: false),
+                    RequestPath = table.Column<string>(type: "text", nullable: false),
+                    Tablename = table.Column<string>(type: "text", nullable: false),
+                    CorrelationId = table.Column<string>(type: "text", nullable: false),
+                    Changes = table.Column<string>(type: "jsonb", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AuditLogs", x => x.Id);
+                });
 
-            migrationBuilder.AlterColumn<string>(
-                name: "PaymentType",
-                table: "Operations",
-                type: "character varying(50)",
-                maxLength: 50,
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "text",
-                oldNullable: true);
-
-            migrationBuilder.AlterColumn<string>(
-                name: "Name",
-                table: "Operations",
-                type: "character varying(250)",
-                maxLength: 250,
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "text");
-
-            migrationBuilder.AlterColumn<string>(
-                name: "Instruction",
-                table: "Operations",
-                type: "character varying(1000)",
-                maxLength: 1000,
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "text",
-                oldNullable: true);
+            migrationBuilder.CreateTable(
+                name: "Operations",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "character varying(250)", maxLength: 250, nullable: false),
+                    Instruction = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
+                    Tpz = table.Column<float>(type: "real", nullable: false),
+                    PaymentType = table.Column<int>(type: "integer", nullable: true),
+                    Section = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    HourLength = table.Column<int>(type: "integer", nullable: false),
+                    isDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Operations", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "Orders",
@@ -57,7 +59,8 @@ namespace NPO_Workflow.DAL.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
                     InternationalName = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: true),
-                    Comment = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true)
+                    Comment = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    isDeleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -168,7 +171,13 @@ namespace NPO_Workflow.DAL.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "AuditLogs");
+
+            migrationBuilder.DropTable(
                 name: "TechnologyOperations");
+
+            migrationBuilder.DropTable(
+                name: "Operations");
 
             migrationBuilder.DropTable(
                 name: "Technologies");
@@ -178,44 +187,6 @@ namespace NPO_Workflow.DAL.Migrations
 
             migrationBuilder.DropTable(
                 name: "Orders");
-
-            migrationBuilder.AlterColumn<string>(
-                name: "Section",
-                table: "Operations",
-                type: "text",
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "character varying(100)",
-                oldMaxLength: 100);
-
-            migrationBuilder.AlterColumn<string>(
-                name: "PaymentType",
-                table: "Operations",
-                type: "text",
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "character varying(50)",
-                oldMaxLength: 50,
-                oldNullable: true);
-
-            migrationBuilder.AlterColumn<string>(
-                name: "Name",
-                table: "Operations",
-                type: "text",
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "character varying(250)",
-                oldMaxLength: 250);
-
-            migrationBuilder.AlterColumn<string>(
-                name: "Instruction",
-                table: "Operations",
-                type: "text",
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "character varying(1000)",
-                oldMaxLength: 1000,
-                oldNullable: true);
         }
     }
 }

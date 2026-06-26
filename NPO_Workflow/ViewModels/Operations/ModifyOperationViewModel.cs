@@ -15,7 +15,7 @@ namespace NPO_Workflow.ViewModels.Operations
         [Range(0.0, double.MaxValue, ErrorMessage = "Значение Т п.з. не может быть отрицательным")]
         public float? Tpz { get; set; }
 
-        public string? PaymentType { get; set; }
+        public int? PaymentType { get; set; }
 
         [Required(ErrorMessage = "Участок обязателен для заполнения")]
         public string Section { get; set; } = string.Empty;

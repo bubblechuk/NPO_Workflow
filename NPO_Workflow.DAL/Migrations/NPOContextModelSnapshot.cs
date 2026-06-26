@@ -117,9 +117,8 @@ namespace NPO_Workflow.DAL.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("character varying(250)");
 
-                    b.Property<string>("PaymentType")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                    b.Property<int?>("PaymentType")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Section")
                         .IsRequired()

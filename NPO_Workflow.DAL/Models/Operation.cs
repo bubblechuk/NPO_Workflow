@@ -17,8 +17,7 @@ namespace NPO_Workflow.DAL.Models
         [Required(ErrorMessage = "Значение Тп.з. обязательно")]
         public float Tpz { get; set; }
 
-        [MaxLength(50, ErrorMessage = "Вид оплаты не может превышать 50 символов")]
-        public string? PaymentType { get; set; }
+        public int? PaymentType { get; set; }
 
         [Required(ErrorMessage = "Участок обязателен для заполнения")]
         [MaxLength(100, ErrorMessage = "Название участка не может превышать 100 символов")]
