@@ -5,7 +5,9 @@ using NPO_Workflow.DAL.Services;
 using NPO_Workflow.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddDbContext<NPOContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<NPOContext>(options => 
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")
+));
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddControllersWithViews();
 builder.Services.AddAuthentication(NegotiateDefaults.AuthenticationScheme).AddNegotiate();

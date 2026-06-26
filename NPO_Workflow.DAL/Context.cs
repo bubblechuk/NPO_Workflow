@@ -10,6 +10,10 @@ namespace NPO_Workflow.DAL
     public class NPOContext : DbContext
     {
         private readonly ICurrentUserService _currentUserService;
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<Detail> Details { get; set; }
+        public DbSet<Technology> Technologies { get; set; }
+        public DbSet<TechnologyOperation> TechnologyOperations { get; set; }
         public DbSet<Operation> Operations { get; set; }
         public DbSet<AuditLog> AuditLogs { get; set; }
         public NPOContext(DbContextOptions<NPOContext> options, ICurrentUserService currentUserService) : base(options)
@@ -22,7 +26,30 @@ namespace NPO_Workflow.DAL
             modelBuilder.Entity<AuditLog>()
                 .Property(e => e.Changes)
                 .HasColumnType("jsonb");
-            
+            modelBuilder.Entity<Detail>()
+                .HasOne<Order>()
+                .WithMany()
+                .HasForeignKey(d => d.OrderId);
+            modelBuilder.Entity<Detail>()
+                .HasOne<Detail>()
+                .WithMany()
+                .HasForeignKey(d => d.ParentId)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Technology>()
+                .HasOne<Detail>()
+                .WithOne()
+                .HasForeignKey<Technology>(t => t.DetailId);
+            modelBuilder.Entity<TechnologyOperation>(entity =>
+            {
+                entity.HasOne<Technology>()
+                    .WithMany()
+                    .HasForeignKey(to => to.TechnologyId)
+                    .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne<Operation>()
+                    .WithMany()
+                    .HasForeignKey(to => to.OperationId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
             //TBD
         }
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
