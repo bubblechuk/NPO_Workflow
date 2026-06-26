@@ -1,0 +1,26 @@
+﻿@model NPO_Workflow.ViewModels.Orders.OrderViewModel
+
+<form asp-action="Create" asp-controller="Orders" method="post">
+    @Html.AntiForgeryToken()
+    <p class="text-muted small"><span class="text-danger">*</span> — обязательные для заполнения поля</p>
+    <input type="hidden" asp-for="Id" />
+    <div class="form-group mb-2">
+        <label asp-for="Name" class="form-label">Название <span class="text-danger">*</span></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-2">
+        <label asp-for="InternationalName" class="form-label">Название (иностранное)</label>
+        <input asp-for="InternationalName" class="form-control" />
+        <span asp-validation-for="InternationalName" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-2">
+        <label asp-for="Comment" class="form-label">Комментарий</label>
+        <input asp-for="Comment" class="form-control" />
+        <span asp-validation-for="Comment" class="text-danger"></span>
+    </div>
+    <div class="modal-footer px-0 pb-0 d-flex gap-2">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+        <button type="submit" class="btn btn-success">Сохранить</button>
+    </div>
+</form>

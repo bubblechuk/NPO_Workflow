@@ -1,17 +1,17 @@
-﻿@model IEnumerable<NPO_Workflow.ViewModels.Operations.OperationViewModel>
+﻿@model IEnumerable<NPO_Workflow.ViewModels.Orders.OrderViewModel>
 
 <div class="d-flex justify-content-between align-items-center mt-3 mb-3" id="crud-container" data-controller="@ViewContext.RouteData.Values["controller"]?.ToString()">
-    <form method="get" action="@Url.Action("Index" ,"Operations")">
-    <div class="input-group" style="max-width: 200px;">
-        <input type="text" class="form-control" placeholder="Поиск..." name="search" value="@Context.Request.Query["search"]">
-        <button class="btn btn-outline-primary" type="submit">
-            <i class="bi-search"></i>
-        </button>
-    </div>
+    <form method="get" action="@Url.Action("Index", "Orders")">
+        <div class="input-group" style="max-width: 200px;">
+            <input type="text" class="form-control" placeholder="Поиск..." name="search" value="@Context.Request.Query["search"]">
+            <button class="btn btn-outline-primary" type="submit">
+                <i class="bi-search"></i>
+            </button>
+        </div>
     </form>
-    <h1 class="display-6">Операции</h1>
+    <h1 class="display-6">Заказы</h1>
     <div class="d-flex gap-2">
-        <button type="button" class="btn btn-primary" id="btn-crud-create"><i class="bi-database-add"></i> Добавить операцию</button>
+        <button type="button" class="btn btn-primary" id="btn-crud-create"><i class="bi-database-add"></i> Добавить заказ</button>
     </div>
 </div>
 <table class="table table-striped text-center" style="table-layout: fixed; width: 100%;">
@@ -21,11 +21,7 @@
             {
                 bool isActive = ViewBag.SortBy == col.Key;
                 bool nextDesc = isActive && ViewBag.SortOrder == true;
-
-                string widthStyle = col.Key == "Id" ? "width: 60px;" :
-                                    col.Key == "Tpz" ? "width: 58px;" :
-                                    col.Key == "PaymentType" ? "width: 85px;" :
-                                    col.Key == "HourLength" ? "width: 78px;" : "";
+                string widthStyle = col.Key == "Id" ? "width: 60px;" : "";
 
                 <th scope="col" style="@widthStyle">
                     <a asp-action="Index"
@@ -43,26 +39,22 @@
         </tr>
     </thead>
     <tbody class="tbody-operations">
-        @foreach (var op in Model)
+        @foreach (var or in Model)
         {
             <tr class="align-middle">
-                <td>@op.Id</td>
-                <td class="tdata" title="@op.Name">@op.Name</td>
-                <td class="tdata" title="@op.Instruction">@op.Instruction</td>
-                <td>@op.Tpz</td>
+                <td>@or.Id</td>
 
-                <td>@op.PaymentType</td>
-
-                <td class="tdata" title="@op.Section">@op.Section</td>
-                <td>@op.HourLength</td>
+                <td class="tdata" title="@or.Name">@or.Name</td>
+                <td class="tdata" title="@or.InternationalName">@or.InternationalName</td>
+                <td class="tdata" title="@or.Comment">@or.Comment</td>
 
                 <td>
-                    <button type="button" class="btn btn-secondary btn-sm btn-crud-modify" title="Редактировать" data-id="@op.Id">
+                    <button type="button" class="btn btn-secondary btn-sm btn-crud-modify" title="Редактировать" data-id="@or.Id">
                         <i class="bi-pencil"></i>
                     </button>
                 </td>
                 <td>
-                    <button type="button" class="btn btn-danger btn-sm btn-crud-delete" title="Удалить" data-id="@op.Id">
+                    <button type="button" class="btn btn-danger btn-sm btn-crud-delete" title="Удалить" data-id="@or.Id">
                         <i class="bi-trash"></i>
                     </button>
                 </td>
@@ -83,7 +75,6 @@
         }
     </tbody>
 </table>
-
 @if (ViewBag.TotalPages > 1)
 {
     int startPage = Math.Max(1, ViewBag.CurrentPage - 1);
@@ -107,12 +98,11 @@
         </ul>
     </div>
 }
-
 <div class="modal fade" id="createModal">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content shadow-lg">
             <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="modalTitle">Новая запись</h5>
+                <h5 class="modal-title" id="modalTitle">Новый запись</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4" id="modalBodyContainer"></div>

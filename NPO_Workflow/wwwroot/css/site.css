@@ -38,6 +38,12 @@ body {
     height: 480px;
     max-height: 480px;
     overflow-y: scroll;
+    white-space: nowrap;
+}
+.tdata {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .nav-link {
     border-radius: 0.25rem;

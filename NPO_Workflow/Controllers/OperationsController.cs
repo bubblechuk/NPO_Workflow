@@ -56,9 +56,9 @@ namespace NPO_Workflow.Controllers
                 new() { Key = "Name", Label = "Наименование" },
                 new() { Key = "Instruction", Label = "№ Инструкции по ТБ" },
                 new() { Key = "Tpz", Label = "Т п.з." },
-                new() { Key = "PaymentType", Label = "Вид оплаты" },
+                new() { Key = "PaymentType", Label = "Вид опл." },
                 new() { Key = "Section", Label = "Участок" },
-                new() { Key = "HourLength", Label = "На операцию (ч)" }
+                new() { Key = "HourLength", Label = "Опл. (ч)" }
             };
             return View(operations);
         }
