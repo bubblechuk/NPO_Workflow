@@ -6,8 +6,8 @@ namespace NPO_Workflow.DAL.Models
     {
         [Key]
         public int Id { get; set; }
-
         [Required]
         public int DetailId { get; set; }
+        public bool isDeleted { get; set; }
     }
 }

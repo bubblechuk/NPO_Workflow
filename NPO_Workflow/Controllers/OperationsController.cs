@@ -69,11 +69,11 @@ namespace NPO_Workflow.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            return PartialView("Views/Operations/_CreatePartial.cshtml", new CreateOperationViewModel());
+            return PartialView("Views/Operations/_CreatePartial.cshtml", new OperationViewModel());
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CreateOperationViewModel model)
+        public async Task<IActionResult> Create(OperationViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -99,9 +99,9 @@ namespace NPO_Workflow.Controllers
             var targetOperation = await _context.Operations.FirstOrDefaultAsync(operation => operation.Id == id);
             if (targetOperation == null)
             {
-                return NotFound(new { message = $"Операция с ID {id} не найдена или удалена." });
+                return NotFound(new { message = $"Объект с ID {id} не найдена или удалена." });
             }
-            var model = new ModifyOperationViewModel()
+            var model = new OperationViewModel()
             {
                 Id = targetOperation.Id,
                 Name = targetOperation.Name,
@@ -114,7 +114,7 @@ namespace NPO_Workflow.Controllers
             return PartialView("Views/Operations/_ModifyPartial.cshtml", model);
         }
         [HttpPost]
-        public async Task<IActionResult> Modify(ModifyOperationViewModel model)
+        public async Task<IActionResult> Modify(OperationViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -139,7 +139,7 @@ namespace NPO_Workflow.Controllers
         {
             var targetOperation = await _context.Operations.FirstOrDefaultAsync(operation => operation.Id == id);
             if (targetOperation == null) {
-                return NotFound(new { message = $"Операция с ID {id} не найдена или уже удалена." });
+                return NotFound(new { message = $"Объект с ID {id} не найдена или уже удалена." });
             }
             targetOperation.isDeleted = true;
             await _context.SaveChangesAsync();

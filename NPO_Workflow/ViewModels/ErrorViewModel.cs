@@ -1,4 +1,4 @@
-namespace NPO_Workflow.Models
+namespace NPO_Workflow.ViewModels
 {
     public class ErrorViewModel
     {

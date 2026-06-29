@@ -1,0 +1,112 @@
+﻿@model IEnumerable<NPO_Workflow.ViewModels.Details.DetailViewModel>
+
+<div class="d-flex justify-content-between align-items-center mt-3 mb-3" id="crud-container" data-controller="@ViewContext.RouteData.Values["controller"]?.ToString()">
+    <form method="get" action="@Url.Action("Index", "Details")">
+        <div class="input-group" style="max-width: 200px;">
+            <input type="text" class="form-control border-primary" placeholder="Поиск..." name="search" value="@Context.Request.Query["search"]">
+            <button class="btn btn-primary" type="submit">
+                <i class="bi-search"></i>
+            </button>
+        </div>
+    </form>
+    <h1 class="display-6">Детали</h1>
+    <div class="d-flex gap-2">
+        <button type="button" class="btn btn-primary" id="btn-crud-create"><i class="bi-database-add"></i> Добавить деталь</button>
+    </div>
+</div>
+<table class="table table-striped text-center" style="table-layout: fixed; width: 100%;">
+    <thead class="thead-dark">
+        <tr>
+            @foreach (var col in ViewBag.Columns)
+            {
+                bool isActive = ViewBag.SortBy == col.Key;
+                bool nextDesc = isActive && ViewBag.SortOrder == true;
+                string widthStyle = col.Key == "Id" ? "width: 60px;" : "";
+
+                <th scope="col" style="@widthStyle">
+                    <a asp-action="Index"
+                       asp-route-page="1"
+                       asp-route-search="@ViewBag.SearchQuery"
+                       asp-route-sortBy="@col.Key"
+                       asp-route-sortOrder="@(nextDesc ? false : true)"
+                       class="text-decoration-none @(isActive ? "fw-bold" : "")">
+                        @col.Label @(isActive ? (ViewBag.SortOrder == false ? "▲" : "▼") : "")
+                    </a>
+                </th>
+            }
+            <th style="width: 45px;"></th>
+            <th style="width: 45px;"></th>
+        </tr>
+    </thead>
+    <tbody class="tbody-operations">
+        @foreach (var or in Model)
+        {
+            <tr class="align-middle">
+                <td>@or.Id</td>
+
+                <td class="tdata" title="@or.Name">@or.Name</td>
+                <td class="tdata" title="@or.OrderId">@or.OrderName</td>
+                <td class="tdata" title="@or.ParentId">@or.ParentDetailName</td>
+                <td class="tdata" title="@or.Quantity">@or.Quantity</td>
+
+                <td>
+                    <button type="button" class="btn btn-secondary btn-sm btn-crud-modify" title="Редактировать" data-id="@or.Id">
+                        <i class="bi-pencil"></i>
+                    </button>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-danger btn-sm btn-crud-delete" title="Удалить" data-id="@or.Id">
+                        <i class="bi-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        }
+        @if (Model.Count() < 10)
+        {
+            int totalColumns = (ViewBag.Columns as System.Collections.ICollection)?.Count ?? 0;
+            for (int i = 0; i < 10 - Model.Count(); i++)
+            {
+                <tr class="align-middle" style="height: 48px;">
+                    @for (int j = 0; j < totalColumns + 2; j++)
+                    {
+                        <td>&nbsp;</td>
+                    }
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+@if (ViewBag.TotalPages > 1)
+{
+    int startPage = Math.Max(1, ViewBag.CurrentPage - 1);
+    int endPage = Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 1);
+    <div class="d-flex justify-content-center">
+        <ul class="pagination">
+            <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                <a class="page-link" href="@Url.Action("Index", new { search = ViewBag.SearchQuery, sortBy = ViewBag.SortBy, sortOrder = ViewBag.SortOrder, page = ViewBag.CurrentPage - 1 })">Пред.</a>
+            </li>
+
+            @for (int p = startPage; p <= endPage; p++)
+            {
+                <li class="page-item @(p == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("Index", new { search = ViewBag.SearchQuery, sortBy = ViewBag.SortBy, sortOrder = ViewBag.SortOrder, page = p })">@p</a>
+                </li>
+            }
+
+            <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                <a class="page-link" href="@Url.Action("Index", new { search = ViewBag.SearchQuery, sortBy = ViewBag.SortBy, sortOrder = ViewBag.SortOrder, page = ViewBag.CurrentPage + 1 })">След.</a>
+            </li>
+        </ul>
+    </div>
+}
+<div class="modal fade" id="createModal">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content shadow-lg">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalTitle">Новая запись</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4" id="modalBodyContainer"></div>
+        </div>
+    </div>
+</div>

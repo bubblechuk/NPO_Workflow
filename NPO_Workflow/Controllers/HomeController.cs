@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using NPO_Workflow.Models;
+using NPO_Workflow.ViewModels;
 using System.Diagnostics;
 
 namespace NPO_Workflow.Controllers

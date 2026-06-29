@@ -89,7 +89,7 @@ namespace NPO_Workflow.Controllers
             var targetItem = await _context.Orders.FirstOrDefaultAsync(item => item.Id == id);
             if (targetItem == null)
             {
-                return NotFound(new { message = $"Операция с ID {id} не найдена или удалена." });
+                return NotFound(new { message = $"Объект с ID {id} не найдена или удалена." });
             }
             var model = new OrderViewModel()
             {
@@ -124,7 +124,7 @@ namespace NPO_Workflow.Controllers
             var targetOrder = await _context.Orders.FirstOrDefaultAsync(order => order.Id == id);
             if (targetOrder == null)
             {
-                return NotFound(new { message = $"Операция с ID {id} не найдена или уже удалена." });
+                return NotFound(new { message = $"Объект с ID {id} не найдена или уже удалена." });
             }
             targetOrder.isDeleted = true;
             await _context.SaveChangesAsync();
