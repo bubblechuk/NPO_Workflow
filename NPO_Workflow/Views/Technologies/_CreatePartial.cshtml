@@ -1,0 +1,21 @@
+﻿@model NPO_Workflow.ViewModels.Technologies.TechnologyViewModel
+
+<form asp-action="Create" asp-controller="Technologies" method="post">
+    @Html.AntiForgeryToken()
+    <p class="text-muted small"><span class="text-danger">*</span> — обязательные для заполнения поля</p>
+    <hr />
+    <div class="row">
+        <div class="form-group col-md-6 mb-2">
+            <label asp-for="DetailId" class="form-label">Наименование детали<span class="text-danger">*</span></label>
+            <select asp-for="DetailId" asp-items="Model.DetailsList" class="form-select">
+                <option value="">-- Выберите заказ --</option>
+            </select>
+            <span asp-validation-for="DetailId" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="modal-footer px-0 pb-0 d-flex gap-2">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+        <button type="submit" class="btn btn-success">Сохранить</button>
+    </div>
+</form>
