@@ -54,6 +54,58 @@ namespace NPO_Workflow.DAL
         }
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
+            var changedEntries = ChangeTracker.Entries()
+        .Where(e => e.State == EntityState.Modified)
+        .ToList();
+
+            var deletedOrderIds = changedEntries
+                .Where(e => e.Entity is Order order && order.isDeleted)
+                .Select(e => ((Order)e.Entity).Id)
+                .ToList();
+
+            var deletedDetailIds = changedEntries
+                .Where(e => e.Entity is Detail detail && detail.isDeleted)
+                .Select(e => ((Detail)e.Entity).Id)
+                .ToList();
+
+            var deletedTechIds = changedEntries
+                .Where(e => e.Entity is Technology tech && tech.isDeleted)
+                .Select(e => ((Technology)e.Entity).Id)
+                .ToList();
+
+            if (deletedOrderIds.Any())
+            {
+                var detailIdsFromOrders = await Details
+                    .Where(d => deletedOrderIds.Contains(d.OrderId) && !d.isDeleted)
+                    .Select(d => d.Id)
+                    .ToListAsync(cancellationToken);
+
+                if (detailIdsFromOrders.Any())
+                {
+                    await Details.Where(d => detailIdsFromOrders.Contains(d.Id)).ExecuteUpdateAsync(s => s.SetProperty(x => x.isDeleted, true), cancellationToken);
+                    deletedDetailIds.AddRange(detailIdsFromOrders);
+                }
+            }
+
+            if (deletedDetailIds.Any())
+            {
+                var techIdsFromDetails = await Technologies
+                    .Where(t => deletedDetailIds.Contains(t.DetailId) && !t.isDeleted)
+                    .Select(t => t.Id)
+                    .ToListAsync(cancellationToken);
+
+                if (techIdsFromDetails.Any())
+                {
+                    await Technologies.Where(t => techIdsFromDetails.Contains(t.Id)).ExecuteUpdateAsync(s => s.SetProperty(x => x.isDeleted, true), cancellationToken);
+                    deletedTechIds.AddRange(techIdsFromDetails); 
+                }
+            }
+            if (deletedTechIds.Any())
+            {
+                await TechnologyOperations
+                    .Where(to => deletedTechIds.Contains(to.TechnologyId) && !to.isDeleted)
+                    .ExecuteUpdateAsync(s => s.SetProperty(x => x.isDeleted, true), cancellationToken);
+            }
             var auditEntries = OnBeforeSaveChanges();
             var result = await base.SaveChangesAsync(cancellationToken);
             if (auditEntries.Any())
