@@ -54,11 +54,11 @@ namespace NPO_Workflow.Controllers
             ViewBag.SortOrder = sortOrder;
             ViewBag.Columns = new List<SortColumn>
             {
-                new() { Key = "Id", Label = "ID" },
+                new() { Key = "Id", Label = "ID технологии" },
                 new() { Key = "DetailId", Label = "Наименование детали" },
             };
 
-            return View("Technologies", items);
+            return View(items);
         }
 
         [HttpGet]
@@ -160,11 +160,6 @@ namespace NPO_Workflow.Controllers
                 .ToListAsync();
 
             model.DetailsList = new SelectList(details, "Id", "Name", model.DetailId);
-        }
-
-        public IActionResult Operations()
-        {
-            return View("TechnologyOperations");
         }
     }
 }
