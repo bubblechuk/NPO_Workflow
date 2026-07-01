@@ -9,7 +9,7 @@ using NPO_Workflow.ViewModels.Orders;
 
 namespace NPO_Workflow.Controllers
 {
-    [Authorize(Roles = @"DESKTOP-RDH7AFR\docker-users")]
+    // [Authorize(Roles = @"DESKTOP-RDH7AFR\docker-users")]
     public class OrdersController : Controller
     {
         private readonly NPOContext _context;

@@ -76,37 +76,5 @@
         }
     </tbody>
 </table>
-@if (ViewBag.TotalPages > 1)
-{
-    int startPage = Math.Max(1, ViewBag.CurrentPage - 1);
-    int endPage = Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 1);
-    <div class="d-flex justify-content-center">
-        <ul class="pagination">
-            <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
-                <a class="page-link" href="@Url.Action("Index", new { search = ViewBag.SearchQuery, sortBy = ViewBag.SortBy, sortOrder = ViewBag.SortOrder, page = ViewBag.CurrentPage - 1 })">Пред.</a>
-            </li>
-
-            @for (int p = startPage; p <= endPage; p++)
-            {
-                <li class="page-item @(p == ViewBag.CurrentPage ? "active" : "")">
-                    <a class="page-link" href="@Url.Action("Index", new { search = ViewBag.SearchQuery, sortBy = ViewBag.SortBy, sortOrder = ViewBag.SortOrder, page = p })">@p</a>
-                </li>
-            }
-
-            <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
-                <a class="page-link" href="@Url.Action("Index", new { search = ViewBag.SearchQuery, sortBy = ViewBag.SortBy, sortOrder = ViewBag.SortOrder, page = ViewBag.CurrentPage + 1 })">След.</a>
-            </li>
-        </ul>
-    </div>
-}
-<div class="modal fade" id="createModal">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content shadow-lg">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="modalTitle">Новая запись</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-4" id="modalBodyContainer"></div>
-        </div>
-    </div>
-</div>
+<partial name="_Pagination"></partial>
+<partial name="_Modal"></partial>
