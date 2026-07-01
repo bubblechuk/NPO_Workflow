@@ -1,10 +1,5 @@
 ﻿@model IEnumerable<NPO_Workflow.ViewModels.Technologies.TechnologyViewModel>
 
-<div class="d-flex flex-column mt-3 mb-3 align-items-center gap-3">
-<h1 class="display-6">Технологии</h1>
-
-</div>
-
 <div class="d-flex justify-content-between align-items-center mt-3 mb-3" id="crud-container" data-controller="@ViewContext.RouteData.Values["controller"]?.ToString()">
     <form method="get" action="@Url.Action("Index", "Technologies")">
         <div class="input-group" style="max-width: 200px;">
@@ -14,12 +9,7 @@
             </button>
         </div>
     </form>
-    <nav>
-        <div class="nav nav-pills">
-            <a class="nav-link active" href="/Technologies">Управление технологиями</a>
-            <a class="nav-link" href="/Technologies/Operations">Операции Технологии</a>
-        </div>
-    </nav>
+    <h1 class="display-6">Технологии</h1>
     <div class="d-flex gap-2">
         <button type="button" class="btn btn-primary" id="btn-crud-create"><i class="bi-database-add"></i> Добавить технологию</button>
     </div>
@@ -51,8 +41,8 @@
     <tbody class="tbody-operations">
         @foreach (var or in Model)
         {
-            <tr class="align-middle">
-                <td>@or.Id</td>
+            <tr class="align-middle tbody-tr">
+                <td data="tech-id">@or.Id</td>
 
                 <td class="tdata" title="@or.DetailId">@or.DetailName</td>
                 <td>
@@ -82,37 +72,5 @@
         }
     </tbody>
 </table>
-@if (ViewBag.TotalPages > 1)
-{
-    int startPage = Math.Max(1, ViewBag.CurrentPage - 1);
-    int endPage = Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 1);
-    <div class="d-flex justify-content-center">
-        <ul class="pagination">
-            <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
-                <a class="page-link" href="@Url.Action("Index", new { search = ViewBag.SearchQuery, sortBy = ViewBag.SortBy, sortOrder = ViewBag.SortOrder, page = ViewBag.CurrentPage - 1 })">Пред.</a>
-            </li>
-
-            @for (int p = startPage; p <= endPage; p++)
-            {
-                <li class="page-item @(p == ViewBag.CurrentPage ? "active" : "")">
-                    <a class="page-link" href="@Url.Action("Index", new { search = ViewBag.SearchQuery, sortBy = ViewBag.SortBy, sortOrder = ViewBag.SortOrder, page = p })">@p</a>
-                </li>
-            }
-
-            <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
-                <a class="page-link" href="@Url.Action("Index", new { search = ViewBag.SearchQuery, sortBy = ViewBag.SortBy, sortOrder = ViewBag.SortOrder, page = ViewBag.CurrentPage + 1 })">След.</a>
-            </li>
-        </ul>
-    </div>
-}
-<div class="modal fade" id="createModal">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content shadow-lg">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="modalTitle">Новая запись</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-4" id="modalBodyContainer"></div>
-        </div>
-    </div>
-</div>
+<partial name="_Pagination"></partial>
+<partial name="_Modal"></partial>

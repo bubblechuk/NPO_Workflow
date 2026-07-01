@@ -12,7 +12,8 @@ $(document).ready(() => {
             $('#createModal').modal('show')
         })
     })
-    $('.tbody-operations').on('click', '.btn-crud-modify', function () {
+    $('.tbody-operations').on('click', '.btn-crud-modify', function (e) {
+        e.stopPropagation();
         var operationId = $(this).data('id')
         var url = '/' + controller + "/Modify" + '/' + operationId
         $('#modalTitle').text("Редактирование записи")
@@ -20,10 +21,11 @@ $(document).ready(() => {
             $('#createModal').modal('show')
         })
     })
-    $('.tbody-operations').on('click', '.btn-crud-delete', function () {
-        var operationId = $(this).data('id')
+    $('.tbody-operations').on('click', '.btn-crud-delete', function (e) {
+        e.stopPropagation();
+        var operationId = $(this).data('id');
         var url = '/' + controller + '/Delete';
-        var $row = $(this).closest('tr')
+        var $row = $(this).closest('tr');
         if (confirm(`Вы уверены что хотите удалить запись с ID: ${operationId}?`)) {
             $.ajax({
                 url: url,
@@ -33,22 +35,25 @@ $(document).ready(() => {
                     $row.fadeOut(400, function () {
                         $(this).remove();
                         window.location.reload();
-                    })
+                    });
                 },
                 error: function (xhr, status, error) {
-                    alert('Ошибка удаления записи: ' + error)
+                    alert('Ошибка удаления записи: ' + error);
                 }
-            })
+            });
         }
-    })
-
+    });
     $('#createModal').on('submit', 'form', function (e) {
         e.preventDefault();
 
         var $form = $(this);
         var url = $form.attr('action');
+        var currentUrl = window.location.href;
         var formData = $form.serialize();
-
+        if (currentUrl.includes("Technologies/Operations"))
+        {
+            url += '?techid=' + currentUrl.split("/")[5];
+        }
         $.ajax({
             url: url,
             type: 'POST',
@@ -69,5 +74,34 @@ $(document).ready(() => {
                 alert("Ошибка при отправке данных: " + error);
             }
         });
+    });
+    $('.tbody-operations').on('click', '.tbody-tr', function () {
+
+        var techId = $(this).find('td[data="tech-id"]').text().trim();
+        window.location.href = '/Technologies/Operations/' + techId;
+    });
+    $('.tbody-operations').on('click', '.op-row', function (e) {
+        if ($(e.target).closest('.btn-crud-modify, .btn-crud-delete').length > 0) {
+            return;
+        }
+        var $radio = $(this).find('.op-radio');
+        $radio.prop('checked', true);
+        $('.op-row').removeClass('table-primary fw-bold');
+        $(this).addClass('table-primary fw-bold');
+        $('#btn-move-up, #btn-move-down').prop('disabled', false);
+    });
+
+    $('#btn-move-up').on('click', function () {
+        var selectedId = $('.op-radio:checked').val();
+        if (selectedId) {
+            window.location.replace('/TechOps/Move?techopid=' + selectedId + '&direction=1&selectedOpId=' + selectedId);
+        }
+    });
+
+    $('#btn-move-down').on('click', function () {
+        var selectedId = $('.op-radio:checked').val();
+        if (selectedId) {
+            window.location.replace('/TechOps/Move?techopid=' + selectedId + '&direction=0&selectedOpId=' + selectedId);
+        }
     });
 })

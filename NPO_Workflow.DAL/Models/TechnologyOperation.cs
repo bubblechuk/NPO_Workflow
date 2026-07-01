@@ -9,6 +9,8 @@ namespace NPO_Workflow.DAL.Models
         [Required]
         public int TechnologyId { get; set; }
         [Required]
+        public int HierarchyId { get; set; }
+        [Required]
         public int OperationId { get; set; }
         public bool isDeleted { get; set; }
     }

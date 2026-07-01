@@ -1,6 +1,6 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
-    ViewData["Username"] = User?.Identity?.Name;
+    ViewData["Username"] = User?.Identity?.Name ?? "Anonymous";
 }
 <!DOCTYPE html>
 <html lang="en">

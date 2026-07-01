@@ -15,14 +15,13 @@ namespace NPO_Workflow.Controllers
     public class TechOpsController : Controller
     {
         private readonly NPOContext _context;
-        [Route("/Technologies/Operations", Name = "TechOperationsIndex")]
-        public async Task<IActionResult> Index(string search, int page = 1, string sortBy = "Id", bool? sortOrder = null)
+        [Route("/Technologies/Operations/{id}", Name = "TechOperationsIndex")]
+        public async Task<IActionResult> Index(int id, int? selectedOpId, int page = 1)
         {
             int pageSize = 10;
             if (page < 1) page = 1;
 
-            var query = from teo in _context.TechnologyOperations.Where(t => !t.isDeleted)
-
+            var query = from teo in _context.TechnologyOperations.Where(t => !t.isDeleted && t.TechnologyId == id)
                         join te in _context.Technologies.Where(d => !d.isDeleted)
                             on teo.TechnologyId equals te.Id into techJoin
                         from tech in techJoin.DefaultIfEmpty()
@@ -31,43 +30,36 @@ namespace NPO_Workflow.Controllers
                         from operation in opJoin.DefaultIfEmpty()
                         join de in _context.Details.Where(d => !d.isDeleted)
                             on (tech != null ? tech.DetailId : 0) equals de.Id into detailJoin
-                        from detail in detailJoin.DefaultIfEmpty()
-                        select new TechOpViewModel {
+                        from detail in detailJoin
+                        .DefaultIfEmpty()
+                        select new TechOpViewModel
+                        {
                             Id = teo.Id,
+                            HierarchyId = teo.HierarchyId,
                             TechnologyId = teo.TechnologyId,
                             OperationId = teo.OperationId,
                             OperationName = operation != null ? operation.Name : "-",
-                            DetailName = detail != null ? detail.Name : "-"
                         };
-
-            if (!string.IsNullOrWhiteSpace(search))
-            {
-                string searchLower = search.ToLower();
-                query = query.Where(vm => vm.OperationName.ToLower().Contains(searchLower) || 
-                                          vm.TechnologyId.ToString().Contains(searchLower) ||
-                                          vm.OperationName.ToLower().Contains(searchLower) ||
-                                          vm.DetailName.ToLower().Contains(searchLower));
-            }
 
             int totalItems = await query.CountAsync();
             int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
             if (totalPages < 1) totalPages = 1;
 
             var items = await query
-                .OrderByDynamic(sortBy, sortOrder ?? false)
+                .OrderByDynamic("HierarchyId", false)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
-
+            var detailName = await (from tech in _context.Technologies.Where(item => !item.isDeleted && item.Id == id)
+                from detail in _context.Details.Where(d => !d.isDeleted && tech.DetailId == d.Id)
+                select detail.Name).FirstOrDefaultAsync() ?? "-";
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = totalPages;
-            ViewBag.SearchQuery = search;
-            ViewBag.SortBy = sortBy;
-            ViewBag.SortOrder = sortOrder;
+            ViewBag.DetailName = detailName;
+            ViewBag.SelectedOpId = selectedOpId;
             ViewBag.Columns = new List<SortColumn>
             {
-                new() { Key = "Id", Label = "ID тех. операции" },
-                new() { Key = "DetailName", Label = "Наименование детали"},
+                new() { Key = "HierarchyId", Label="№"},
                 new() { Key = "OperationName", Label = "Наименование операции" }
             };
 
@@ -88,12 +80,8 @@ namespace NPO_Workflow.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(TechOpViewModel model)
+        public async Task<IActionResult> Create([FromQuery] int techid, TechOpViewModel model)
         {
-            if (model.TechnologyId <= 0)
-            {
-                ModelState.AddModelError("TechnologyId", "Необходимо выбрать деталь из списка.");
-            }
             if (model.OperationId <= 0)
             {
                 ModelState.AddModelError("OperationId", "Необходимо выбрать операцию из списка.");
@@ -104,10 +92,14 @@ namespace NPO_Workflow.Controllers
                 await RebuildSelectListsAsync(model);
                 return PartialView("Views/TechOps/_CreatePartial.cshtml", model);
             }
-
+            var lastItem = await _context.TechnologyOperations
+                .Where(item => item.TechnologyId == techid)
+                .OrderByDescending(item => item.HierarchyId) 
+                .FirstOrDefaultAsync() ?? new TechnologyOperation() { HierarchyId = 0 };
             var newItem = new TechnologyOperation
             {
-                TechnologyId = model.TechnologyId,
+                HierarchyId = lastItem.HierarchyId + 1,
+                TechnologyId = techid,
                 OperationId = model.OperationId,  
                 isDeleted = false
             };
@@ -134,7 +126,6 @@ namespace NPO_Workflow.Controllers
             ).ToListAsync();
 
             model.OperationsList = new SelectList(operations, "Id", "Name", model.OperationId);
-            model.DetailsList = new SelectList(detailsWithTech, "TechnologyId", "DetailName", model.TechnologyId);
         }
         [HttpGet]
         public async Task<IActionResult> Modify(int id)
@@ -146,6 +137,7 @@ namespace NPO_Workflow.Controllers
             }
             var model = new TechOpViewModel()
             {
+                HierarchyId = targetItem.HierarchyId,
                 TechnologyId = targetItem.TechnologyId,
                 OperationId = targetItem.OperationId
             };
@@ -158,10 +150,6 @@ namespace NPO_Workflow.Controllers
         [HttpPost]
         public async Task<IActionResult> Modify(TechOpViewModel model)
         {
-            if (model.TechnologyId <= 0)
-            {
-                ModelState.AddModelError("TechnologyId", "Необходимо выбрать деталь из списка.");
-            }
             if (model.OperationId <= 0)
             {
                 ModelState.AddModelError("OperationId", "Необходимо выбрать технологическую операцию из списка.");
@@ -192,6 +180,42 @@ namespace NPO_Workflow.Controllers
             target.isDeleted = true;
             await _context.SaveChangesAsync();
             return Ok();
+        }
+
+        [HttpGet]
+        [HttpGet]
+        public async Task<IActionResult> Move([FromQuery] int techopid, [FromQuery] int direction, [FromQuery] int? selectedOpId)
+        {
+            var currentOp = await _context.TechnologyOperations.FirstOrDefaultAsync(tech => tech.Id == techopid);
+            if (currentOp == null) return NotFound();
+
+            int techId = currentOp.TechnologyId;
+            int currentHId = currentOp.HierarchyId;
+
+            TechnologyOperation neighborOp = null;
+
+            if (direction == 1)
+            {
+                neighborOp = await _context.TechnologyOperations
+                    .Where(tech => tech.TechnologyId == techId && tech.HierarchyId < currentHId && !tech.isDeleted)
+                    .OrderByDescending(tech => tech.HierarchyId).FirstOrDefaultAsync();
+            }
+            else if (direction == 0)
+            {
+                neighborOp = await _context.TechnologyOperations
+                    .Where(tech => tech.TechnologyId == techId && tech.HierarchyId > currentHId && !tech.isDeleted)
+                    .OrderBy(tech => tech.HierarchyId).FirstOrDefaultAsync();
+            }
+
+            if (neighborOp != null)
+            {
+                int temp = currentOp.HierarchyId;
+                currentOp.HierarchyId = neighborOp.HierarchyId;
+                neighborOp.HierarchyId = temp;
+
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction("Operations", "Technologies", new { id = techId, selectedOpId = selectedOpId });
         }
     }
 }
