@@ -1,0 +1,102 @@
+@model NPO_Workflow.ViewModels.Calendar.CalendarViewModel;
+
+<div class="d-flex flex-column justify-content-between align-items-center mt-3 mb-3" id="crud-container" data-controller="@ViewContext.RouteData.Values["controller"]?.ToString()">
+    <h1 class="display-4 m-3">Календарь</h1>
+    <table class="table align-middle text-center table-calendar-fixed">
+        <tr>
+            <th></th>
+            <th>
+                <a class="btn btn-primary text-decoration-none" href="/Calendar/@Model.PrevYear/@Model.Month">
+                    <i class="bi bi-caret-left-fill"></i><i class="bi bi-caret-left-fill"></i> @Model.PrevYear
+                </a>
+            </th>
+            <th>
+                <a class="btn btn-primary text-decoration-none" href="/Calendar/@(Model.Year - (Model.Month == 1 ? 1 : 0))/@(Model.Month == 1 ? 12 : Model.Month - 1)">
+                    <i class="bi bi-caret-left-fill"></i> @Model.PreviousMonthName
+                </a>
+            </th>
+            <th>
+                <h4 class="mb-0 text-uppercase fw-bold text-nowrap" style="line-height: inherit">@Model.MonthName @Model.Year</h4>
+            </th>
+            <th>
+                <a class="btn btn-primary text-decoration-none" href="/Calendar/@(Model.Year + (Model.Month == 12 ? 1 : 0))/@(Model.Month == 12 ? 1 : Model.Month + 1)">
+                    @Model.NextMonthName <i class="bi bi-caret-right-fill"></i>
+                </a>
+            </th>
+            <th>
+                <a class="btn btn-primary text-decoration-none" href="/Calendar/@Model.NextYear/@Model.Month">
+                    @Model.NextYear <i class="bi bi-caret-right-fill"></i><i class="bi bi-caret-right-fill"></i>
+                </a>
+            </th>
+            <th></th>
+        </tr>
+    </table>
+    <table class="table table-bordered text-center align-middle table-calendar-fixed">
+        <thead>
+        <tr class="table-primary text-white">
+            <th>Понедельник</th>
+            <th>Вторник</th>
+            <th>Среда</th>
+            <th>Четверг</th>
+            <th>Пятница</th>
+            <th>Суббота</th>
+            <th>Воскресенье</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            @for (int j = 0; j < Model.EmptyDaysBefore; j++)
+            {
+                <td class="table-light">&nbsp;</td>
+            }
+
+            @for (int i = 0; i < Model.Days.Count; i++)
+            {
+                var day = Model.Days[i];
+                <td class="@(day.IsException ? "bg-warning-subtle" : "") 
+           @(day.WorkingHours == 0m ? "bg-danger-subtle" : "") btn-calendar" 
+                    data-date="@day.Date.ToString("yyyy/M/d", System.Globalization.CultureInfo.InvariantCulture)"
+                    style="position: relative; cursor: pointer;"> <div class="d-flex flex-column day-cell" style="min-height: 100%">
+                        <span class="align-self-start text-muted small">@day.Date.Day</span>
+        
+                        <strong class="align-self-center" style="margin-top: 1rem">@day.WorkingHours ч</strong>
+        
+                        @if (!string.IsNullOrEmpty(day.Comment))
+                        {
+                            <small class="text-truncate" style="color: #6f42c1;">@day.Comment</small>
+                        }
+                    </div>
+
+                    @if (day.IsException)
+                    {
+                        <button type="button" 
+                                class="btn btn-sm btn-danger btn-calendar-delete" 
+                                data-date="@day.Date.ToString("yyyy/M/d", System.Globalization.CultureInfo.InvariantCulture)"
+                                style="position: absolute; top: 4px; right: 4px; padding: 0.1rem 0.3rem; z-index: 10;">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    }
+                </td>
+
+                int currentPosition = Model.EmptyDaysBefore + i + 1;
+            
+                if (currentPosition % 7 == 0 && i != Model.Days.Count - 1)
+                {
+                    @:</tr><tr>
+                }
+            }
+
+            @{
+                int totalCells = Model.EmptyDaysBefore + Model.Days.Count;
+                int remainingCells = (7 - (totalCells % 7)) % 7;
+            
+                for (int k = 0; k < remainingCells; k++)
+                {
+                    <td class="table-light">&nbsp;</td>
+                }
+            }
+        </tr>
+        </tbody>
+    </table>
+</div>
+<partial name="_Modal"></partial>

@@ -1,0 +1,21 @@
+@model NPO_Workflow.ViewModels.Calendar.CalendarDayItemDto
+
+<form action="/Calendar/Modify" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Date" />
+    <p class="text-muted small"><span class="text-danger">*</span> — обязательные для заполнения поля</p>
+    <div class="form-group mb-2">
+        <label asp-for="WorkingHours" class="form-label">Часов работы<span class="text-danger">*</span></label>
+        <input asp-for="WorkingHours" class="form-control" />
+        <span asp-validation-for="WorkingHours" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-2">
+        <label asp-for="Comment" class="form-label">Комментарий</label>
+        <input asp-for="Comment" class="form-control" />
+        <span asp-validation-for="Comment" class="text-danger"></span>
+    </div>
+    <div class="modal-footer px-0 pb-0 d-flex gap-2">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+        <button type="submit" class="btn btn-success">Сохранить</button>
+    </div>
+</form>

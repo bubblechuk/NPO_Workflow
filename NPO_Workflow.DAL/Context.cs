@@ -16,6 +16,8 @@ namespace NPO_Workflow.DAL
         public DbSet<TechnologyOperation> TechnologyOperations { get; set; }
         public DbSet<Operation> Operations { get; set; }
         public DbSet<AuditLog> AuditLogs { get; set; }
+        public DbSet<CalendarWeek> CalendarWeeks { get; set; }
+        public DbSet<CalendarException> CalendarExceptions { get; set; }
         public NPOContext(DbContextOptions<NPOContext> options, ICurrentUserService currentUserService) : base(options)
         {
             _currentUserService = currentUserService;
@@ -50,7 +52,15 @@ namespace NPO_Workflow.DAL
                     .HasForeignKey(to => to.OperationId)
                     .OnDelete(DeleteBehavior.Restrict);
             });
-            //TBD
+            modelBuilder.Entity<CalendarWeek>().HasData(
+                new CalendarWeek { Id = 1, CalendarId = 1, DayOfWeek = DayOfWeek.Monday,    WorkingHours = 8.25m },
+                new CalendarWeek { Id = 2, CalendarId = 1, DayOfWeek = DayOfWeek.Tuesday,   WorkingHours = 8.25m },
+                new CalendarWeek { Id = 3, CalendarId = 1, DayOfWeek = DayOfWeek.Wednesday, WorkingHours = 8.25m },
+                new CalendarWeek { Id = 4, CalendarId = 1, DayOfWeek = DayOfWeek.Thursday,  WorkingHours = 8.25m },
+                new CalendarWeek { Id = 5, CalendarId = 1, DayOfWeek = DayOfWeek.Friday,    WorkingHours = 7.25m },
+                new CalendarWeek { Id = 6, CalendarId = 1, DayOfWeek = DayOfWeek.Saturday,  WorkingHours = 0m },
+                new CalendarWeek { Id = 7, CalendarId = 1, DayOfWeek = DayOfWeek.Sunday,    WorkingHours = 0m }
+            );
         }
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {

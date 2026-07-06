@@ -30,7 +30,7 @@ $(document).ready(() => {
             $.ajax({
                 url: url,
                 type: 'POST',
-                data: { id: operationId },
+                data: {id: operationId},
                 success: function (result) {
                     $row.fadeOut(400, function () {
                         $(this).remove();
@@ -50,8 +50,7 @@ $(document).ready(() => {
         var url = $form.attr('action');
         var currentUrl = window.location.href;
         var formData = $form.serialize();
-        if (currentUrl.includes("Technologies/Operations"))
-        {
+        if (currentUrl.includes("Technologies/Operations")) {
             url += '?techid=' + currentUrl.split("/")[5];
         }
         $.ajax({
@@ -104,4 +103,59 @@ $(document).ready(() => {
             window.location.replace('/TechOps/Move?techopid=' + selectedId + '&direction=0&selectedOpId=' + selectedId);
         }
     });
+
+    // const $daycells = $(".table-calendar-fixedr").find('.day-cell')
+    // if ($daycells.length > 0) {
+    //     $daycells.each(function () {
+    //         $(this).find("strong").first().val() == "0.0 ч"
+    //     })
+    // }
+    $(".table-calendar-fixed").on("click", "day-cell", function (e) {
+        e.stopPropagation();
+
+    })
+    $(".btn-calendar").on("click", function (e) {
+        if ($(e.target).closest('.btn-calendar-delete').length > 0) {
+            return;
+        }
+        e.preventDefault();
+        var date = $(this).data('date');
+        var $exception = $(this).closest('td').find('small');
+        var isEditing = $exception.length > 0;
+        var action = isEditing ? '/Modify' : '/Create';
+        var url = '/' + controller + action + '/' + date;
+        $('#modalTitle').text(isEditing ? "Редактировать исключение" : "Новое исключение");
+        $('#modalBodyContainer').load(url, function () {
+            $('#createModal').modal('show');
+        });
+    });
+    $(document).on("click", ".btn-calendar-delete", function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        
+        var $btn = $(this);
+        var $cell = $btn.closest('td');
+        var hasException = $cell.find('small').length > 0;
+        if (hasException) {
+            var date = $btn.data('date');
+            var url = '/' + controller + "/Delete/" + date;
+
+            if (confirm(`Вы уверены, что хотите удалить исключение на дату: ${date}?`)) {
+                $.ajax({
+                    url: url,
+                    type: 'DELETE',
+                    success: function (result) {
+                        $cell.fadeOut(400, function () {
+                            window.location.reload();
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        alert('Ошибка удаления записи: ' + error);
+                    }
+                });
+            }
+        }
+    });
 })
+        
+        

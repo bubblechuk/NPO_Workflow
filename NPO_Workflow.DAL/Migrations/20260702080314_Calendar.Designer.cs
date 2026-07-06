@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NPO_Workflow.DAL;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NPO_Workflow.DAL.Migrations
 {
     [DbContext(typeof(NPOContext))]
-    partial class NPOContextModelSnapshot : ModelSnapshot
+    [Migration("20260702080314_Calendar")]
+    partial class Calendar
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -84,11 +87,8 @@ namespace NPO_Workflow.DAL.Migrations
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date");
 
-                    b.Property<decimal>("WorkingHours")
-                        .HasColumnType("numeric");
-
-                    b.Property<bool>("isDeleted")
-                        .HasColumnType("boolean");
+                    b.Property<int>("WorkingHours")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
