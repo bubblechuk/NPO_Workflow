@@ -30,13 +30,13 @@ public class CalendarController : Controller
             .Where(t => t.CalendarId == 1)
             .ToDictionaryAsync(t => t.DayOfWeek, t => t.WorkingHours);
         var calendarExceptions = await _context.CalendarExceptions
-            .Where(e => e.CalendarId == 1 && e.Date >= firstDay && e.Date <= lastDay && e.isDeleted == false)
+            .Where(e => e.CalendarId == 1 && e.Date >= firstDay && e.Date <= lastDay && e.IsDeleted == false)
             .ToDictionaryAsync(e => e.Date, e => e);
         var daysList = new List<CalendarDayItemDto>();
         for (var date = firstDay; date <= lastDay; date = date.AddDays(1))
         {
             decimal hours = 0;
-            string comment = string.Empty;
+            string? comment = string.Empty;
             bool isException = false;
 
             if (calendarExceptions.TryGetValue(date, out var exception))
@@ -110,7 +110,7 @@ public class CalendarController : Controller
     public async Task<IActionResult> Modify(int year, int month, int day)
     {
         var targetDate = new DateOnly(year, month, day);
-        var targetItem = await _context.CalendarExceptions.FirstOrDefaultAsync(ce => ce.Date == targetDate && ce.isDeleted == false);
+        var targetItem = await _context.CalendarExceptions.FirstOrDefaultAsync(ce => ce.Date == targetDate && ce.IsDeleted == false);
         if (targetItem == null)
         {
             return NotFound(new { message = $"Объект с датой {targetDate.ToString()} не найден или уже удален." });
@@ -133,7 +133,7 @@ public class CalendarController : Controller
         {
             return PartialView("/Views/Calendar/_ModifyPartial.cshtml", viewModel);
         }
-        var dbOperation = await _context.CalendarExceptions.FirstOrDefaultAsync(ce => ce.Date == viewModel.Date && ce.isDeleted == false);
+        var dbOperation = await _context.CalendarExceptions.FirstOrDefaultAsync(ce => ce.Date == viewModel.Date && ce.IsDeleted == false);
         var duplicate = await _context.CalendarExceptions.FirstOrDefaultAsync(ce => ce.Date == viewModel.Date);
         if (dbOperation == null)
         {
@@ -150,16 +150,16 @@ public class CalendarController : Controller
         return Ok();
     }
 
-    [HttpDelete("/Calendar/Delete")]
+    [HttpDelete("/Calendar/Delete/{year:int}/{month:int}/{day:int}")]
     public async Task<IActionResult> Delete(int year, int month, int day)
     {
         var targetDate = new DateOnly(year, month, day);
-        var target = await _context.CalendarExceptions.FirstOrDefaultAsync(ce => ce.Date == targetDate &&  ce.isDeleted == false );
+        var target = await _context.CalendarExceptions.FirstOrDefaultAsync(ce => ce.Date == targetDate &&  ce.IsDeleted == false );
         if (target == null)
         {
             return NotFound(new { message = $"Объект с датой {targetDate.ToString()} не найден или уже удален." });
         }
-        target.isDeleted = true;
+        target.IsDeleted = true;
         await _context.SaveChangesAsync();
         return Ok();
     }

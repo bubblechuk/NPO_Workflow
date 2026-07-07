@@ -21,14 +21,14 @@ namespace NPO_Workflow.Controllers
             int pageSize = 10;
             if (page < 1) page = 1;
 
-            var query = from teo in _context.TechnologyOperations.Where(t => !t.isDeleted && t.TechnologyId == id)
-                        join te in _context.Technologies.Where(d => !d.isDeleted)
+            var query = from teo in _context.TechnologyOperations.Where(t => !t.IsDeleted && t.TechnologyId == id)
+                        join te in _context.Technologies.Where(d => !d.IsDeleted)
                             on teo.TechnologyId equals te.Id into techJoin
                         from tech in techJoin.DefaultIfEmpty()
-                        join op in _context.Operations.Where(d => !d.isDeleted)
+                        join op in _context.Operations.Where(d => !d.IsDeleted)
                             on teo.OperationId equals op.Id into opJoin
                         from operation in opJoin.DefaultIfEmpty()
-                        join de in _context.Details.Where(d => !d.isDeleted)
+                        join de in _context.Details.Where(d => !d.IsDeleted)
                             on (tech != null ? tech.DetailId : 0) equals de.Id into detailJoin
                         from detail in detailJoin
                         .DefaultIfEmpty()
@@ -39,6 +39,7 @@ namespace NPO_Workflow.Controllers
                             TechnologyId = teo.TechnologyId,
                             OperationId = teo.OperationId,
                             OperationName = operation != null ? operation.Name : "-",
+                            HourLength = operation.HourLength
                         };
 
             int totalItems = await query.CountAsync();
@@ -50,8 +51,8 @@ namespace NPO_Workflow.Controllers
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
-            var detailName = await (from tech in _context.Technologies.Where(item => !item.isDeleted && item.Id == id)
-                from detail in _context.Details.Where(d => !d.isDeleted && tech.DetailId == d.Id)
+            var detailName = await (from tech in _context.Technologies.Where(item => !item.IsDeleted && item.Id == id)
+                from detail in _context.Details.Where(d => !d.IsDeleted && tech.DetailId == d.Id)
                 select detail.Name).FirstOrDefaultAsync() ?? "-";
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = totalPages;
@@ -60,7 +61,8 @@ namespace NPO_Workflow.Controllers
             ViewBag.Columns = new List<SortColumn>
             {
                 new() { Key = "HierarchyId", Label="№"},
-                new() { Key = "OperationName", Label = "Наименование операции" }
+                new() { Key = "OperationName", Label = "Наименование операции" },
+                new() { Key = "HourLength", Label = "Время операции"}
             };
 
             return View(items);
@@ -101,7 +103,7 @@ namespace NPO_Workflow.Controllers
                 HierarchyId = lastItem.HierarchyId + 1,
                 TechnologyId = techid,
                 OperationId = model.OperationId,  
-                isDeleted = false
+                IsDeleted = false
             };
             _context.TechnologyOperations.Add(newItem);
             await _context.SaveChangesAsync();
@@ -110,12 +112,12 @@ namespace NPO_Workflow.Controllers
         private async Task RebuildSelectListsAsync(TechOpViewModel model)
         {
             var operations = await _context.Operations
-                .Where(op => !op.isDeleted)
+                .Where(op => !op.IsDeleted)
                 .OrderBy(op => op.Name)
                 .ToListAsync();
             var detailsWithTech = await (
-                from d in _context.Details.Where(d => !d.isDeleted)
-                join t in _context.Technologies.Where(t => !t.isDeleted)
+                from d in _context.Details.Where(d => !d.IsDeleted)
+                join t in _context.Technologies.Where(t => !t.IsDeleted)
                     on d.Id equals t.DetailId
                 orderby d.Name
                 select new
@@ -177,7 +179,7 @@ namespace NPO_Workflow.Controllers
             {
                 return NotFound(new { message = $"Объект с ID {id} не найден или уже удален." });
             }
-            target.isDeleted = true;
+            target.IsDeleted = true;
             await _context.SaveChangesAsync();
             return Ok();
         }
@@ -192,26 +194,24 @@ namespace NPO_Workflow.Controllers
             int techId = currentOp.TechnologyId;
             int currentHId = currentOp.HierarchyId;
 
-            TechnologyOperation neighborOp = null;
+            TechnologyOperation? neighborOp = null;
 
             if (direction == 1)
             {
                 neighborOp = await _context.TechnologyOperations
-                    .Where(tech => tech.TechnologyId == techId && tech.HierarchyId < currentHId && !tech.isDeleted)
+                    .Where(tech => tech.TechnologyId == techId && tech.HierarchyId < currentHId && !tech.IsDeleted)
                     .OrderByDescending(tech => tech.HierarchyId).FirstOrDefaultAsync();
             }
             else if (direction == 0)
             {
                 neighborOp = await _context.TechnologyOperations
-                    .Where(tech => tech.TechnologyId == techId && tech.HierarchyId > currentHId && !tech.isDeleted)
+                    .Where(tech => tech.TechnologyId == techId && tech.HierarchyId > currentHId && !tech.IsDeleted)
                     .OrderBy(tech => tech.HierarchyId).FirstOrDefaultAsync();
             }
 
             if (neighborOp != null)
             {
-                int temp = currentOp.HierarchyId;
-                currentOp.HierarchyId = neighborOp.HierarchyId;
-                neighborOp.HierarchyId = temp;
+                (currentOp.HierarchyId, neighborOp.HierarchyId) = (neighborOp.HierarchyId, currentOp.HierarchyId);
 
                 await _context.SaveChangesAsync();
             }

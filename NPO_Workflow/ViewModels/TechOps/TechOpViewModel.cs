@@ -10,6 +10,7 @@ namespace NPO_Workflow.ViewModels.TechOps
         public int TechnologyId { get; set; }
         public int OperationId { get; set; }
         public string? OperationName { get; set; }
+        public decimal? HourLength { get; set; }
         public SelectList? OperationsList { get; set; }
     }
 }

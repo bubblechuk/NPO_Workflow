@@ -9,11 +9,11 @@ namespace NPO_Workflow.TagHelpers
     {
         [HtmlAttributeNotBound]
         [ViewContext]
-        public ViewContext ViewContext { get; set; }
+        public ViewContext? ViewContext { get; set; }
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
-            var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+            var currentController = ViewContext?.RouteData.Values["controller"]?.ToString();
             var targetController = context.AllAttributes["asp-controller"]?.Value?.ToString();
 
             if (string.Equals(currentController, targetController, StringComparison.OrdinalIgnoreCase))

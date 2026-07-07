@@ -45,6 +45,9 @@
                 <td data="tech-id">@or.Id</td>
 
                 <td class="tdata" title="@or.DetailId">@or.DetailName</td>
+                <td class="tdata">@(or.BeginDate == null ? "-" : or.BeginDate)</td>
+                <td class="tdata">@(or.EndDate == null ? "-" : or.EndDate) </td>
+                <td class="tdata">@or.HourLength</td>
                 <td>
                     <button type="button" class="btn btn-secondary btn-sm btn-crud-modify" title="Редактировать" data-id="@or.Id">
                         <i class="bi-pencil"></i>
@@ -74,3 +77,8 @@
 </table>
 <partial name="_Pagination"></partial>
 <partial name="_Modal"></partial>
+<style>
+    .tbody-operations tr {
+        cursor: pointer;
+    }
+</style>

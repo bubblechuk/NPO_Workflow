@@ -15,16 +15,13 @@ namespace NPO_Workflow.Middlewares
             {
                 correlationId = System.Guid.NewGuid().ToString();
             }
-            string username = context.User?.Identity?.IsAuthenticated == true
-                ? context.User.Identity.Name
-                : "Anonymous";
+
+            string? username = context.User?.Identity?.Name;
             string requestPath = context.Request.Path;
-            currentUser.UserName = username;
+            currentUser.UserName = username ?? "Anonymous";
             currentUser.RequestPath = requestPath;
             currentUser.CorrelationId = correlationId.ToString();
-            ///
 
-            
             await _next(context);
         }
 }

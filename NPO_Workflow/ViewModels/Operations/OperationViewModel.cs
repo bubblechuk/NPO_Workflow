@@ -21,6 +21,6 @@ namespace NPO_Workflow.ViewModels.Operations
 
         [Required(ErrorMessage = "Длительность операции обязательна")]
         [Range(0, int.MaxValue, ErrorMessage = "Длительность не может быть отрицательной")]
-        public int? HourLength { get; set; }
+        public decimal? HourLength { get; set; }
     }
 }

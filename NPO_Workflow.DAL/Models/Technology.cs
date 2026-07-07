@@ -8,6 +8,8 @@ namespace NPO_Workflow.DAL.Models
         public int Id { get; set; }
         [Required]
         public int DetailId { get; set; }
-        public bool isDeleted { get; set; }
+        public DateOnly? BeginDate { get; set; }
+        public DateOnly? EndDate { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }

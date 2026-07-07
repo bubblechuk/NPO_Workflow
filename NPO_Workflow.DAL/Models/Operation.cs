@@ -24,8 +24,8 @@ namespace NPO_Workflow.DAL.Models
         public string Section { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Длительность операции обязательна")]
-        public int HourLength { get; set; }
+        public decimal HourLength { get; set; }
 
-        public bool isDeleted { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }

@@ -16,6 +16,6 @@ namespace NPO_Workflow.DAL.Models
 
         [MaxLength(500, ErrorMessage = "Комментарий не может превышать 500 символов")]
         public string? Comment { get; set; }
-        public bool isDeleted { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }

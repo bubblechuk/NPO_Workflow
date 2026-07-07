@@ -11,12 +11,12 @@ namespace NPO_Workflow.DAL.Models
         public int Id { get; set; }
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
         public string LogLevel { get; set; } = "Information";
-        public string User { get; set; }
-        public string Action { get; set; }
-        public string RequestPath { get; set; }
-        public string Tablename { get; set; }
-        public string CorrelationId { get; set; }
-        public string Changes { get; set; } 
+        public string User { get; set; } = string.Empty;
+        public string Action { get; set; } = string.Empty;
+        public string RequestPath { get; set; } = string.Empty;
+        public string Tablename { get; set; } = string.Empty;
+        public string CorrelationId { get; set; } = string.Empty;
+        public string Changes { get; set; } = string.Empty;
 
     }
 }

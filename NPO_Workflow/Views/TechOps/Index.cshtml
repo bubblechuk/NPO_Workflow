@@ -46,7 +46,7 @@
             <tr class="align-middle op-row @(isCurrentSelected ? "table-primary fw-bold" : "")" data-id="@or.Id">
                 <td class="tdata" title="@or.HierarchyId">@or.HierarchyId</td>
                 <td class="tdata" title="@or.OperationId">@or.OperationName</td>
-                
+                <td class="tdata">@or.HourLength</td>
                 <td>
                     <input type="radio" name="operationSelection" class="op-radio" value="@or.Id" @(isCurrentSelected ? "checked" : "") />
                 </td>

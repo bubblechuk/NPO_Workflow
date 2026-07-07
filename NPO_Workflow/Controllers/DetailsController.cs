@@ -19,8 +19,8 @@ namespace NPO_Workflow.Controllers
             int pageSize = 10;
             if (page < 1) page = 1;
 
-            var query = from de in _context.Details.Where(d => !d.isDeleted)
-                        join or in _context.Orders.Where(o => !o.isDeleted) on de.OrderId equals or.Id into orderJoin
+            var query = from de in _context.Details.Where(d => !d.IsDeleted)
+                        join or in _context.Orders.Where(o => !o.IsDeleted) on de.OrderId equals or.Id into orderJoin
                         from subOrder in orderJoin.DefaultIfEmpty()
                         join pDe in _context.Details on de.ParentId equals pDe.Id into parentJoin
                         from subParent in parentJoin.DefaultIfEmpty()
@@ -39,9 +39,11 @@ namespace NPO_Workflow.Controllers
             {
                 string searchLower = search.ToLower();
 
-                query = query.Where(vm => vm.Name.ToLower().Contains(searchLower)
-                                       || vm.OrderName.ToLower().Contains(searchLower)
-                                       || vm.ParentDetailName.ToLower().Contains(searchLower));
+                query = query.Where(vm => 
+                    (vm.Name != null && vm.Name.ToLower().Contains(searchLower))
+                    || (vm.OrderName != null && vm.OrderName.ToLower().Contains(searchLower))
+                    || (vm.ParentDetailName != null && vm.ParentDetailName.ToLower().Contains(searchLower))
+                );
             }
 
             int totalItems = await query.CountAsync();
@@ -78,11 +80,11 @@ namespace NPO_Workflow.Controllers
         public async Task<IActionResult> Create()
         {
             var orders = await _context.Orders
-                .Where(o => !o.isDeleted)
+                .Where(o => !o.IsDeleted)
                 .ToListAsync();
 
             var parentDetails = await _context.Details
-                .Where(d => !d.isDeleted)
+                .Where(d => !d.IsDeleted)
                 .ToListAsync();
             var viewModel = new DetailViewModel()
             {
@@ -102,7 +104,7 @@ namespace NPO_Workflow.Controllers
             }
             if (model.ParentId.HasValue)
             {
-                var parentDetail = await _context.Details.FirstOrDefaultAsync(d => d.Id == model.ParentId && !d.isDeleted);
+                var parentDetail = await _context.Details.FirstOrDefaultAsync(d => d.Id == model.ParentId && !d.IsDeleted);
                 if (parentDetail == null)
                 {
                     ModelState.AddModelError("ParentId", "Указанная родительская деталь не найдена.");
@@ -125,7 +127,7 @@ namespace NPO_Workflow.Controllers
                 OrderId = model.OrderId ?? 0,
                 ParentId = model.ParentId,
                 Quantity = model.Quantity,
-                isDeleted = false
+                IsDeleted = false
             };
 
             _context.Details.Add(newItem);
@@ -135,8 +137,8 @@ namespace NPO_Workflow.Controllers
 
         private async Task RebuildSelectListsAsync(DetailViewModel model)
         {
-            var orders = await _context.Orders.Where(o => !o.isDeleted).ToListAsync();
-            var parentDetails = await _context.Details.Where(d => !d.isDeleted && d.Id != model.Id).ToListAsync();
+            var orders = await _context.Orders.Where(o => !o.IsDeleted).ToListAsync();
+            var parentDetails = await _context.Details.Where(d => !d.IsDeleted && d.Id != model.Id).ToListAsync();
 
             model.OrdersList = new SelectList(orders, "Id", "Name");
             model.ParentDetailsList = new SelectList(parentDetails, "Id", "Name");
@@ -150,11 +152,11 @@ namespace NPO_Workflow.Controllers
                 return NotFound(new { message = $"Объект с ID {id} не найдена или удалена." });
             }
             var orders = await _context.Orders
-                .Where(o => !o.isDeleted)
+                .Where(o => !o.IsDeleted)
                 .ToListAsync();
 
             var parentDetails = await _context.Details
-                .Where(d => !d.isDeleted)
+                .Where(d => !d.IsDeleted)
                 .ToListAsync();
             var model = new DetailViewModel()
             {
@@ -179,7 +181,7 @@ namespace NPO_Workflow.Controllers
             }
 
             var dbOperation = await _context.Details.FindAsync(model.Id);
-            if (dbOperation == null || dbOperation.isDeleted)
+            if (dbOperation == null || dbOperation.IsDeleted)
             {
                 return NotFound(new { message = "Редактируемая деталь не найдена." });
             }
@@ -189,7 +191,7 @@ namespace NPO_Workflow.Controllers
             }
             if (model.ParentId.HasValue && ModelState.IsValid)
             {
-                var parentDetail = await _context.Details.FirstOrDefaultAsync(d => d.Id == model.ParentId && !d.isDeleted);
+                var parentDetail = await _context.Details.FirstOrDefaultAsync(d => d.Id == model.ParentId && !d.IsDeleted);
                 if (parentDetail == null)
                 {
                     ModelState.AddModelError("ParentId", "Указанная родительская деталь не найдена.");
@@ -252,7 +254,7 @@ namespace NPO_Workflow.Controllers
             {
                 return NotFound(new { message = $"Объект с ID {id} не найдена или уже удалена." });
             }
-            target.isDeleted = true;
+            target.IsDeleted = true;
             await _context.SaveChangesAsync();
             return Ok();
         }

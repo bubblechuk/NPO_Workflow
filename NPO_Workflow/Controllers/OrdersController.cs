@@ -17,13 +17,15 @@ namespace NPO_Workflow.Controllers
         {
             int pageSize = 10;
             if (page < 1) page = 1;
-            var query = _context.Orders.Where(item => item.isDeleted == false);
+            var query = _context.Orders.Where(item => item.IsDeleted == false);
             if (!string.IsNullOrWhiteSpace(search))
             {
                 string searchLower = search.ToLower();
-                query = query.Where(or => or.Name.ToLower().Contains(searchLower)
-                                       || or.InternationalName.ToLower().Contains(searchLower)
-                                       || or.Comment.ToLower().Contains(searchLower));
+                query = query.Where(or => 
+                    (or.Name != null && or.Name.ToLower().Contains(searchLower))
+                    || (or.InternationalName != null && or.InternationalName.ToLower().Contains(searchLower))
+                    || (or.Comment != null && or.Comment.ToLower().Contains(searchLower))
+                );
             }
             int totalItems = await query.CountAsync();
             int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
@@ -77,7 +79,7 @@ namespace NPO_Workflow.Controllers
                 Name = model.Name,
                 InternationalName = model.InternationalName,
                 Comment = model.Comment,
-                isDeleted = false
+                IsDeleted = false
             };
             _context.Orders.Add(newItem);
             await _context.SaveChangesAsync();
@@ -126,7 +128,7 @@ namespace NPO_Workflow.Controllers
             {
                 return NotFound(new { message = $"Объект с ID {id} не найдена или уже удалена." });
             }
-            targetOrder.isDeleted = true;
+            targetOrder.IsDeleted = true;
             await _context.SaveChangesAsync();
             return Ok();
         }

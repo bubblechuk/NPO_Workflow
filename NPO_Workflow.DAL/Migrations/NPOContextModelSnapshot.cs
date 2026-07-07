@@ -78,17 +78,16 @@ namespace NPO_Workflow.DAL.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("Comment")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
                     b.Property<decimal>("WorkingHours")
                         .HasColumnType("numeric");
-
-                    b.Property<bool>("isDeleted")
-                        .HasColumnType("boolean");
 
                     b.HasKey("Id");
 
@@ -176,6 +175,9 @@ namespace NPO_Workflow.DAL.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -189,9 +191,6 @@ namespace NPO_Workflow.DAL.Migrations
 
                     b.Property<int>("Quantity")
                         .HasColumnType("integer");
-
-                    b.Property<bool>("isDeleted")
-                        .HasColumnType("boolean");
 
                     b.HasKey("Id");
 
@@ -210,12 +209,15 @@ namespace NPO_Workflow.DAL.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("HourLength")
-                        .HasColumnType("integer");
+                    b.Property<decimal>("HourLength")
+                        .HasColumnType("numeric");
 
                     b.Property<string>("Instruction")
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -232,9 +234,6 @@ namespace NPO_Workflow.DAL.Migrations
 
                     b.Property<float>("Tpz")
                         .HasColumnType("real");
-
-                    b.Property<bool>("isDeleted")
-                        .HasColumnType("boolean");
 
                     b.HasKey("Id");
 
@@ -257,13 +256,13 @@ namespace NPO_Workflow.DAL.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("character varying(150)");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("character varying(150)");
-
-                    b.Property<bool>("isDeleted")
-                        .HasColumnType("boolean");
 
                     b.HasKey("Id");
 
@@ -278,10 +277,16 @@ namespace NPO_Workflow.DAL.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateOnly?>("BeginDate")
+                        .HasColumnType("date");
+
                     b.Property<int>("DetailId")
                         .HasColumnType("integer");
 
-                    b.Property<bool>("isDeleted")
+                    b.Property<DateOnly?>("EndDate")
+                        .HasColumnType("date");
+
+                    b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
                     b.HasKey("Id");
@@ -303,14 +308,14 @@ namespace NPO_Workflow.DAL.Migrations
                     b.Property<int>("HierarchyId")
                         .HasColumnType("integer");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
                     b.Property<int>("OperationId")
                         .HasColumnType("integer");
 
                     b.Property<int>("TechnologyId")
                         .HasColumnType("integer");
-
-                    b.Property<bool>("isDeleted")
-                        .HasColumnType("boolean");
 
                     b.HasKey("Id");
 

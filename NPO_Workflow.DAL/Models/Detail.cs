@@ -14,6 +14,6 @@ namespace NPO_Workflow.DAL.Models
         public int OrderId { get; set; }
         [Required(ErrorMessage = "Количество деталей должно быть указано")]
         public int Quantity { get; set; }
-        public bool isDeleted { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }

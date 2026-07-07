@@ -1,8 +1,18 @@
-﻿<div class="text-center">
-    <h1 class="display-4 m-3">Главная</h1>
+﻿@{
+    ViewData["Username"] = User?.Identity?.Name ?? "Anonymous";
+}
+<h1 class="display-4 text-center m-5">Здравствуйте, @ViewData["Username"]!</h1>
+<h1 class="display-6 border-bottom p-3">Уведомления</h1>
+<div class="alert alert-info m-3" role="alert">
+    <p class="mb-0 d-flex align-items-center gap-2"> <i class="bi bi-info fs-4"></i> Вы идентифицированы системой как: @ViewData["UserName"]
+    </p>
 </div>
-<div class="text-center">
-    <h1 class="display-6">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-    </h1>
-</div>
+
+@if (ViewBag.Count > 0)
+{
+    <div class="alert alert-warning m-3" role="alert">
+        <p class="mb-0 d-flex align-items-center gap-2">
+            <i class="bi bi-exclamation fs-4"></i> Требуется заполнить сроки для @ViewBag.Count технологий. Нажмите <a href="/Technologies" class="alert-link">здесь</a> чтобы перейти к заполнению 
+        </p>
+    </div>
+} 

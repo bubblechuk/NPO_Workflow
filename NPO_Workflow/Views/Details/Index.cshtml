@@ -1,4 +1,5 @@
-﻿@model IEnumerable<NPO_Workflow.ViewModels.Details.DetailViewModel>
+﻿@using Microsoft.EntityFrameworkCore.Metadata.Internal
+@model IEnumerable<NPO_Workflow.ViewModels.Details.DetailViewModel>
 
 <div class="d-flex justify-content-between align-items-center mt-3 mb-3" id="crud-container" data-controller="@ViewContext.RouteData.Values["controller"]?.ToString()">
     <form method="get" action="@Url.Action("Index", "Details")">

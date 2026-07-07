@@ -8,6 +8,6 @@ public class CalendarException
     public int CalendarId { get; set; }
     public DateOnly Date { get; set; }
     public decimal WorkingHours { get; set; }
-    public string Comment { get; set; } = string.Empty;
-    public bool isDeleted { get; set; } = false;
+    public string? Comment { get; set; }
+    public bool IsDeleted { get; set; } = false;
 }

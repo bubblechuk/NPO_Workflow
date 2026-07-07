@@ -18,13 +18,15 @@ namespace NPO_Workflow.Controllers
         {
             int pageSize = 10;
             if (page < 1) page = 1;
-            var query = _context.Operations.Where(operation => operation.isDeleted == false);
+            var query = _context.Operations.Where(operation => operation.IsDeleted == false);
             if (!string.IsNullOrWhiteSpace(search))
             {
                 string searchLower = search.ToLower();
-                query = query.Where(op => op.Name.ToLower().Contains(searchLower)
-                                       || op.Instruction.ToLower().Contains(searchLower)
-                                       || op.Section.ToLower().Contains(searchLower));
+                query = query.Where(op => 
+                    (op.Name != null && op.Name.ToLower().Contains(searchLower))
+                    || (op.Instruction != null && op.Instruction.ToLower().Contains(searchLower))
+                    || (op.Section != null && op.Section.ToLower().Contains(searchLower))
+                );
             }
             int totalItems = await query.CountAsync();
             int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
@@ -87,7 +89,7 @@ namespace NPO_Workflow.Controllers
                 PaymentType = model.PaymentType,
                 Section = model.Section,
                 HourLength = model.HourLength ?? 0,
-                isDeleted = false
+                IsDeleted = false
             };
             _context.Operations.Add(newOperation);
             await _context.SaveChangesAsync();
@@ -141,7 +143,7 @@ namespace NPO_Workflow.Controllers
             if (targetOperation == null) {
                 return NotFound(new { message = $"Объект с ID {id} не найдена или уже удалена." });
             }
-            targetOperation.isDeleted = true;
+            targetOperation.IsDeleted = true;
             await _context.SaveChangesAsync();
             return Ok();
         }

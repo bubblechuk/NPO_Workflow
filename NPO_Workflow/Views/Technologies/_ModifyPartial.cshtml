@@ -4,13 +4,28 @@
     @Html.AntiForgeryToken()
     <p class="text-muted small"><span class="text-danger">*</span> — обязательные для заполнения поля</p>
     <hr />
+    
     <div class="row">
-        <div class="form-group col-md-6 mb-2">
+        <div class="form-group col-12 mb-3">
             <label asp-for="DetailId" class="form-label">Наименование детали<span class="text-danger">*</span></label>
             <select asp-for="DetailId" asp-items="Model.DetailsList" class="form-select">
                 <option value="">-- Выберите заказ --</option>
             </select>
             <span asp-validation-for="DetailId" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="form-group col-md-6 mb-3">
+            <label asp-for="BeginDate" class="form-label">Дата начала</label>
+            <input class="form-control" asp-for="BeginDate" type="date" />
+            <span asp-validation-for="BeginDate" class="text-danger"></span>
+        </div>
+
+        <div class="form-group col-md-6 mb-3">
+            <label asp-for="EndDate" class="form-label">Дата конца</label>
+            <input class="form-control" asp-for="EndDate" type="date" />
+            <span asp-validation-for="EndDate" class="text-danger"></span>
         </div>
     </div>
 
